@@ -26,6 +26,10 @@ def pad_sents(sents, pad_token):
     sents_padded = []
 
     ### START CODE HERE (~6 Lines)
+    sents_len = [len(sent) for sent in sents]
+    pads_to_add = [max(sents_len) - int(s_len) for s_len in sents_len]
+    for i, sent in enumerate(sents):
+        sents_padded.append(sent + [pad_token]*pads_to_add[i])
     ### END CODE HERE
 
     return sents_padded
