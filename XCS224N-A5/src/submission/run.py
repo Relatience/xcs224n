@@ -61,7 +61,7 @@ if args.variant == 'vanilla':
     ### [part c]: Make some model here
 
     ### START CODE HERE
-    vanilla_model = model.GPT(mconf) #This initializes the vanilla model with given configuration (see line 51 for configuration).
+    model = model.GPT(mconf) #This initializes the vanilla model with given configuration (see line 51 for configuration).
     ### END CODE HERE
     pass
 
@@ -141,7 +141,7 @@ elif args.function == 'finetune':
     tconf = trainer.TrainerConfig(max_epochs=75, batch_size=256, learning_rate=6e-4,
                     lr_decay=True, warmup_tokens=512*20, final_tokens=200*len(pretrain_dataset)*block_size,
                     num_workers=4)
-    trnr = trainer.Trainer(vanilla_model, pretrain_dataset, args.finetune_corpus_path, tconf)
+    trnr = trainer.Trainer(model, pretrain_dataset, args.finetune_corpus_path, tconf)
     trnr.train()
     ### END CODE HERE
     pass
