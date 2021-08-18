@@ -144,7 +144,7 @@ elif args.function == 'finetune':
                         num_workers=4)
         trnr = trainer.Trainer(model, nd, None, tconf)
         trnr.train()
-        torch.save(trnr.state_dict(), args.writing_params_path)
+        torch.save(trnr, args.writing_params_path)
     else:
         tconf = trainer.TrainerConfig(max_epochs=10, batch_size=256, learning_rate=6e-4,
                         lr_decay=True, warmup_tokens=512*20, final_tokens=200*len(pretrain_dataset)*block_size,
