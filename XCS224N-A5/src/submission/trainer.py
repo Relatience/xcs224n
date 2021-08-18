@@ -84,7 +84,7 @@ class Trainer:
                 # place data on the correct device
                 x = x.to(self.device)
                 y = y.to(self.device)
-
+                print("HERE 87")
                 # forward the model
                 with torch.set_grad_enabled(is_train):
                     logits, loss = model(x, y)
@@ -92,7 +92,7 @@ class Trainer:
                     losses.append(loss.item())
 
                 if is_train:
-
+                    print("HERE 95")
                     # backprop and update the parameters
                     model.zero_grad()
                     loss.backward()
