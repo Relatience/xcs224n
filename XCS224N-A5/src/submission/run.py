@@ -142,8 +142,7 @@ elif args.function == 'finetune':
                     lr_decay=True, warmup_tokens=512*20, final_tokens=200*len(pretrain_dataset)*block_size,
                     num_workers=4)
     trnr = trainer.Trainer(model, pretrain_dataset, args.finetune_corpus_path, tconf)
-    
-    #trnr.train()
+    trnr.train()
     torch.save(trnr.state_dict(), 'model.pt')
     ### END CODE HERE
     pass
