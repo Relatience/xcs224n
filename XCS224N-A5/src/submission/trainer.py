@@ -123,7 +123,8 @@ class Trainer:
 
         self.tokens = 0 # counter used for learning rate decay
         for epoch in range(config.max_epochs):
-
+            print("HERE 126:", config.max_epochs)
+            print("HERE 127:", epoch)
             run_epoch('train')
             if self.test_dataset is not None:
                 run_epoch('test')
