@@ -63,6 +63,7 @@ if args.variant == 'vanilla':
 
     ### START CODE HERE
     model = model.GPT(mconf) #This initializes the vanilla model with given configuration (see line 51 for configuration).
+    model.to(device)
     ### END CODE HERE
     pass
 
@@ -137,13 +138,11 @@ elif args.function == 'finetune':
     ###         num_workers=4
 
     ### START CODE HERE
-    nd = dataset.NameDataset(args.finetune_corpus_path, pretrain_dataset) #
+    nd = dataset.NameDataset(open(args.finetune_corpus_path, encoding='utf-8').read(), pretrain_dataset) #
     if args.reading_params_path is None:
         tconf = trainer.TrainerConfig(max_epochs=75, batch_size=256, learning_rate=6e-4,
                         lr_decay=True, warmup_tokens=512*20, final_tokens=200*len(pretrain_dataset)*block_size,
                         num_workers=4)
-        device = "cuda:0"
-        model = model.to(device)
         trnr = trainer.Trainer(model, nd, None, tconf)
         trnr.train()
         torch.save(model.state_dict(), args.writing_params_path)
