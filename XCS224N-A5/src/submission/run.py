@@ -140,7 +140,7 @@ elif args.function == 'finetune':
         tconf = trainer.TrainerConfig(max_epochs=75, batch_size=256, learning_rate=6e-4,
                         lr_decay=True, warmup_tokens=512*20, final_tokens=200*len(pretrain_dataset)*block_size,
                         num_workers=4)
-        trnr = trainer.Trainer(model, pretrain_dataset, args.finetune_corpus_path, tconf)
+        trnr = trainer.Trainer(model, args.finetune_corpus_path, None, tconf)
         trnr.train()
         torch.save(trnr.state_dict(), args.writing_params_path)
     else:
@@ -148,7 +148,7 @@ elif args.function == 'finetune':
                         lr_decay=True, warmup_tokens=512*20, final_tokens=200*len(pretrain_dataset)*block_size,
                         num_workers=4)
         model.load_state_dict(torch.load(args.reading_params_path))
-        trnr = trainer.Trainer(model, pretrain_dataset, args.finetune_corpus_path, tconf)
+        trnr = trainer.Trainer(model, args.finetune_corpus_path, pretrain_dataset, tconf)
         trnr.train()
         torch.save(trnr.state_dict(), args.writing_params_path)
         
