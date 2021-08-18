@@ -80,7 +80,7 @@ elif args.variant == 'synthesizer':
 if args.function == 'pretrain':
     assert args.pretrain_corpus_path is not None
     assert args.writing_params_path is not None
-
+    print(args.writing_params_path, flush=True)
     ### TODO:
     ### [part f]:
     ### - Given:
