@@ -80,7 +80,6 @@ elif args.variant == 'synthesizer':
 if args.function == 'pretrain':
     assert args.pretrain_corpus_path is not None
     assert args.writing_params_path is not None
-    print(args.writing_params_path, flush=True)
     ### TODO:
     ### [part f]:
     ### - Given:
@@ -105,7 +104,7 @@ if args.function == 'pretrain':
 elif args.function == 'finetune':
     assert args.writing_params_path is not None
     assert args.finetune_corpus_path is not None
-
+    #print("Here:",args.reading_params_path, flush=True)
     ### TODO:
     ### [part c] [part f]:
     ### - Given:
@@ -137,13 +136,22 @@ elif args.function == 'finetune':
     ###         num_workers=4
 
     ### START CODE HERE
-    #assert args.reading_params_path is not None
-    tconf = trainer.TrainerConfig(max_epochs=75, batch_size=256, learning_rate=6e-4,
-                    lr_decay=True, warmup_tokens=512*20, final_tokens=200*len(pretrain_dataset)*block_size,
-                    num_workers=4)
-    trnr = trainer.Trainer(model, pretrain_dataset, args.finetune_corpus_path, tconf)
-    trnr.train()
-    torch.save(trnr.state_dict(), 'model.pt')
+    if args.reading_params_path is None:
+        tconf = trainer.TrainerConfig(max_epochs=75, batch_size=256, learning_rate=6e-4,
+                        lr_decay=True, warmup_tokens=512*20, final_tokens=200*len(pretrain_dataset)*block_size,
+                        num_workers=4)
+        trnr = trainer.Trainer(model, pretrain_dataset, args.finetune_corpus_path, tconf)
+        trnr.train()
+        torch.save(trnr.state_dict(), args.writing_params_path)
+    else:
+        tconf = trainer.TrainerConfig(max_epochs=10, batch_size=256, learning_rate=6e-4,
+                        lr_decay=True, warmup_tokens=512*20, final_tokens=200*len(pretrain_dataset)*block_size,
+                        num_workers=4)
+        model.load_state_dict(torch.load(args.reading_params_path))
+        trnr = trainer.Trainer(model, pretrain_dataset, args.finetune_corpus_path, tconf)
+        trnr.train()
+        torch.save(trnr.state_dict(), args.writing_params_path)
+        
     ### END CODE HERE
     pass
 
