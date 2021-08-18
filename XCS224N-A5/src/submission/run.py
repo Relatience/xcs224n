@@ -143,6 +143,7 @@ elif args.function == 'finetune':
                     num_workers=4)
     trnr = trainer.Trainer(model, pretrain_dataset, args.finetune_corpus_path, tconf)
     trnr.train()
+    torch.save(trnr.state_dict(), 'model.pt')
     ### END CODE HERE
     pass
 
