@@ -206,6 +206,7 @@ class CharCorruptionDataset(Dataset):
         #ridx = random.randint(0, max(0,len(document)-rint)) #1.random start idx from possible range (left-to-right)
         ridx = 0
         trunc_document = document[ridx:ridx+rint] #1.truncate document
+        content_len = len(trunc_document)
         #print("HERE len(doc):",len(document))
         #print("HERE rint:",rint)
         #print("HERE len(td):",len(trunc_document))
@@ -216,10 +217,9 @@ class CharCorruptionDataset(Dataset):
         #lengthMC = random.choices(lengthSL, weights=[1-self.masking_percent, self.masking_percent], k=1)[0] #2. set probabilities per group such to get expected value length of masked content
 
         # decide on the length of the sequence to mask out, and starting index
-        expected_mask_len = int(self.masking_percent*len(trunc_document))
-        masked_content_len = random.randint(
-            int(expected_mask_len*.75), int(expected_mask_len*1.25))
-        mcidx = random.randint(0, int(len(trunc_document))-1-masked_content_len)
+        expected_mask_len = int(self.masking_percent*content_len)
+        masked_content_len = random.randint(int(expected_mask_len*.75), int(expected_mask_len*1.25))
+        mcidx = random.randint(0, int(content_len)-1-masked_content_len)
 
         #mcidx = random.randint(0, len(trunc_document)-lengthMC) #2.random start idx from possible range (left-to-right)
         prefix =  trunc_document[:(mcidx)]
