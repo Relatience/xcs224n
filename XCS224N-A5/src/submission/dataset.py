@@ -202,25 +202,38 @@ class CharCorruptionDataset(Dataset):
 
         ### START CODE HERE
         document = self.data[idx] #0. retrieve element of data, call it document
-        rint = random.randint(4, min(len(document),int(self.block_size*7/8))) #1. random length truncated document
-        ridx = random.randint(0, len(document)-rint) #1.random start idx from possible range (left-to-right)
-        trunc_document = document[ridx:(ridx+rint)] #1.truncate document
-        lengthSL = [random.randrange(0, int(self.masking_percent*len(trunc_document))), random.randrange(int(self.masking_percent*len(trunc_document))+1, len(trunc_document))] 
-        #2. divide possible lengths into 2 groups (one smaller and one larger than ave_mc of trunc_document) with different probabilities (within group uniform [0,1])
-        lengthMC = random.choices(lengthSL, weights=[1-self.masking_percent, self.masking_percent])[0] #2. set probabilities per group such to get expected value length of masked content
-        mcidx = random.randint(0, len(trunc_document)-lengthMC) #2.random start idx from possible range (left-to-right)
-        prefix =  document[:(mcidx-1)]
-        masked_content = document[mcidx:(mcidx+lengthMC)]
-        suffix = document[(mcidx+lengthMC+1):]
-        ms_nopad = prefix + self.MASK_CHAR + suffix + self.MASK_CHAR + masked_content + self.MASK_CHAR
-        masked_string = ms_nopad + self.PAD_CHAR*(self.block_size-len(ms_nopad)) #"...the entire string is of length self.block_size."
+        rint = random.randint(4, int(self.block_size*7/8)) #1. random length truncated document
+        #ridx = random.randint(0, max(0,len(document)-rint)) #1.random start idx from possible range (left-to-right)
+        ridx = 0
+        trunc_document = document[ridx:ridx+rint] #1.truncate document
+        #print("HERE len(doc):",len(document))
+        #print("HERE rint:",rint)
+        #print("HERE len(td):",len(trunc_document))
         
+        quarter_length = int(self.masking_percent*len(trunc_document))
+        lengthSL = [random.randint(0, quarter_length), random.randint(quarter_length+1, len(trunc_document))] 
+        #2. divide possible lengths into 2 groups (one smaller and one larger than masking_percent of trunc_document) with different probabilities (within group uniform [0,1])
+        lengthMC = random.choices(lengthSL, weights=[1-self.masking_percent, self.masking_percent], k=1)[0] #2. set probabilities per group such to get expected value length of masked content
+
+        # decide on the length of the sequence to mask out, and starting index
+        expected_mask_len = int(self.masking_percent*len(trunc_document))
+        masked_content_len = random.randint(
+            int(expected_mask_len*.75), int(expected_mask_len*1.25))
+        mcidx = random.randint(0, int(len(trunc_document))-1-masked_content_len)
+
+        #mcidx = random.randint(0, len(trunc_document)-lengthMC) #2.random start idx from possible range (left-to-right)
+        prefix =  trunc_document[:(mcidx)]
+        masked_content = trunc_document[mcidx:(mcidx+masked_content_len)]
+        suffix = trunc_document[(mcidx+masked_content_len):]
+        ms_nopad = prefix + self.MASK_CHAR + suffix + self.MASK_CHAR + masked_content + self.MASK_CHAR
+        masked_string = ms_nopad + self.PAD_CHAR*(self.block_size-len(ms_nopad)) #"...the entire string is of length self.block_size." #alternative: ' '.join(str(item) for item in [self.stoi[self.PAD_CHAR]])#
+        #print(masked_string)
         x = masked_string[:-1]
         y = masked_string[1:]
 
         x = torch.tensor([self.stoi[c] for c in x], dtype=torch.long) #length self.block_size, encodes the input sequence
         y = torch.tensor([self.stoi[c] for c in y], dtype=torch.long) #length self.block_size, encodes the output sequence
-        return(x,y)
+        return x, y
         ### END CODE HERE
 
         raise NotImplementedError
