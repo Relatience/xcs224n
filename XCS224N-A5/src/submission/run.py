@@ -105,7 +105,7 @@ if args.function == 'pretrain':
                     lr_decay=True, warmup_tokens=512*20, final_tokens=200*len(pretrain_dataset)*block_size,
                     num_workers=4)
     #model.load_state_dict(torch.load(args.reading_params_path))
-    trnr = trainer.Trainer(model, pretrain_dataset, pretrain_dataset, tconf)
+    trnr = trainer.Trainer(model, pretrain_dataset, None, tconf)
     trnr.train()
     torch.save(model.state_dict(), args.writing_params_path)        
     ### END CODE HERE
