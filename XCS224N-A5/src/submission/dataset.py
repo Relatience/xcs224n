@@ -210,10 +210,10 @@ class CharCorruptionDataset(Dataset):
         #print("HERE rint:",rint)
         #print("HERE len(td):",len(trunc_document))
         
-        quarter_length = int(self.masking_percent*len(trunc_document))
-        lengthSL = [random.randint(0, quarter_length), random.randint(quarter_length+1, len(trunc_document))] 
+        #quarter_length = int(self.masking_percent*len(trunc_document))
+        #lengthSL = [random.randint(0, quarter_length), random.randint(quarter_length+1, len(trunc_document))] 
         #2. divide possible lengths into 2 groups (one smaller and one larger than masking_percent of trunc_document) with different probabilities (within group uniform [0,1])
-        lengthMC = random.choices(lengthSL, weights=[1-self.masking_percent, self.masking_percent], k=1)[0] #2. set probabilities per group such to get expected value length of masked content
+        #lengthMC = random.choices(lengthSL, weights=[1-self.masking_percent, self.masking_percent], k=1)[0] #2. set probabilities per group such to get expected value length of masked content
 
         # decide on the length of the sequence to mask out, and starting index
         expected_mask_len = int(self.masking_percent*len(trunc_document))
