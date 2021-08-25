@@ -201,39 +201,27 @@ class CharCorruptionDataset(Dataset):
         ### [part e]: see spec above
 
         ### START CODE HERE
-        document = self.data[idx] #0. retrieve element of data, call it document
-        rint = random.randint(4, int(self.block_size*7/8)) #1. random length truncated document
-        #ridx = random.randint(0, max(0,len(document)-rint)) #1.random start idx from possible range (left-to-right)
-        ridx = 0
-        trunc_document = document[ridx:ridx+rint] #1.truncate document
-        content_len = len(trunc_document)
-        #print("HERE len(doc):",len(document))
-        #print("HERE rint:",rint)
-        #print("HERE len(td):",len(trunc_document))
-        
-        #quarter_length = int(self.masking_percent*len(trunc_document))
-        #lengthSL = [random.randint(0, quarter_length), random.randint(quarter_length+1, len(trunc_document))] 
-        #2. divide possible lengths into 2 groups (one smaller and one larger than masking_percent of trunc_document) with different probabilities (within group uniform [0,1])
-        #lengthMC = random.choices(lengthSL, weights=[1-self.masking_percent, self.masking_percent], k=1)[0] #2. set probabilities per group such to get expected value length of masked content
-
-        # decide on the length of the sequence to mask out, and starting index
-        expected_mask_len = int(self.masking_percent*content_len)
-        masked_content_len = random.randint(int(expected_mask_len*.75), int(expected_mask_len*1.25))
-        mcidx = random.randint(0, int(content_len)-1-masked_content_len)
-
-        #mcidx = random.randint(0, len(trunc_document)-lengthMC) #2.random start idx from possible range (left-to-right)
-        prefix =  trunc_document[:(mcidx)]
-        masked_content = trunc_document[mcidx:(mcidx+masked_content_len)]
-        suffix = trunc_document[(mcidx+masked_content_len):]
-        ms_nopad = prefix + self.MASK_CHAR + suffix + self.MASK_CHAR + masked_content + self.MASK_CHAR
-        masked_string = ms_nopad + self.PAD_CHAR*(self.block_size-len(ms_nopad)) #"...the entire string is of length self.block_size." #alternative: ' '.join(str(item) for item in [self.stoi[self.PAD_CHAR]])#
-        #print(masked_string)
-        x = masked_string[:-1]
-        y = masked_string[1:]
-
-        x = torch.tensor([self.stoi[c] for c in x], dtype=torch.long) #length self.block_size, encodes the input sequence
-        y = torch.tensor([self.stoi[c] for c in y], dtype=torch.long) #length self.block_size, encodes the output sequence
-        return x, y
+        data = self.data[idx]
+        #print(data)
+        # we're actually going to "cheat" and pick a spot in the dataset at random
+        #i = random.randint(0, len(data) - (self.block_size + 1))
+        i = 0
+        chunk = data[i:i+self.block_size+1]
+        dix = [self.stoi[s] for s in chunk]
+        # Select conditioning context and target
+        inp, oup = self.get_context_and_target(dix)
+        # Remove pads from end of conditioning context
+        inp = inp[:inp.index(self.stoi[self.PAD_CHAR])]
+        dix = inp + oup
+        dix = dix + [self.stoi[self.PAD_CHAR]]*(self.block_size-len(dix))
+        inp = torch.tensor(dix[:-1])
+        oup = torch.tensor(dix[1:])
+        # now we pick a random-sized context:
+        #c = torch.tensor(dix[])
+        #x = torch.tensor(dix[:-1], dtype=torch.long)
+        #y = torch.tensor(dix[1:], dtype=torch.long)
+        self.item = (inp, oup)
+        return inp, oup
         ### END CODE HERE
 
         raise NotImplementedError
