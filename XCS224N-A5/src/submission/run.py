@@ -73,6 +73,8 @@ elif args.variant == 'synthesizer':
     ### [part g]: Make some other model here
 
     ### START CODE HERE
+    model = model.GPT(mconf) 
+    model.to(device)   
     ### END CODE HERE
     pass
 
