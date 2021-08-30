@@ -127,7 +127,7 @@ class SynthesizerAttention(nn.Module):
         # self.w1 (is A in the hand-out), self.w2 (is B in the hand-out, is of dimension d/h x l) and self.b2
         # causal self-attention; Self-attend: (B, nh, T, hs) x (B, nh, hs, T) -> (B, nh, T, T)
         #att = (q @ k.transpose(-2, -1)) * (1.0 / math.sqrt(k.size(-1)))
-        att = torch.nn.ReLU(self.w1) @ self.w2 + self.b2
+        att = torch.nn.ReLU(w1) @ w2.transpose(-2, -1) + b2.transpose(-2, -1)
         att = att.masked_fill(self.mask[:,:,:T,:T] == 0, -1e10) # todo: just use float('-inf') instead?
         att = F.softmax(att, dim=-1)
         att = self.attn_drop(att)
