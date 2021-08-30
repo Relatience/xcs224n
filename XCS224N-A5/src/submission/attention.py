@@ -103,9 +103,10 @@ class SynthesizerAttention(nn.Module):
         B, T, C = x.size()
 
         # calculate query, key, values for all heads in batch and move head forward to be the batch dim
-        k = self.key(x).view(B, T, self.n_head, C // self.n_head).transpose(1, 2) # (B, nh, T, hs)
-        q = self.query(x).view(B, T, self.n_head, C // self.n_head).transpose(1, 2) # (B, nh, T, hs)
-        v = self.value(x).view(B, T, self.n_head, C // self.n_head).transpose(1, 2) # (B, nh, T, hs)
+        w1 = self.w1(x).view(B, T, self.config.n_embed, C // self.config.n_head).transpose(1, 2) # (B, nh, T, hs)
+        w2 = self.w2(x).view(B, T, self.config.block_size-1, C // self.config.n_head).transpose(1, 2) # (B, nh, T, hs)
+        b2 = self.b2(x).view(B, T, self.config.block_size-1).transpose(1, 2)
+        v = self.value(x).view(B, T, self.config.n_embed,  C // self.config.n_head).transpose(1, 2) # (B, nh, T, hs)
         ##
         # Hi all, I am a little confused by the "init code" in SynthesizerAttention class. There, self.w2 and self.b2 are defined. But I don't know 
         # why the shape has one element with config.block_size-1? Shouldn't we compute a matrix with shape block_size x block_size?
