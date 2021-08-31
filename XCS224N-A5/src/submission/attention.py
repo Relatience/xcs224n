@@ -104,8 +104,8 @@ class SynthesizerAttention(nn.Module):
 
         # calculate query, key, values for all heads in batch and move head forward to be the batch dim
         w1 = self.w1(x).view(B, T, self.config.n_embed, C // self.config.n_head).transpose(1, 2) # (B, nh, T, hs)
-        w2 = self.w2(x).view(B, T, self.config.block_size-1, C // self.config.n_head).transpose(1, 2) # (B, nh, T, hs)
-        b2 = self.b2(x).view(B, T, self.config.block_size-1).transpose(1, 2)
+        w2 = self.w2[:,:T]#(x).view(B, T, self.config.block_size-1, C // self.config.n_head).transpose(1, 2) # (B, nh, T, hs)
+        b2 = self.b2[:T]#(x).view(B, T, self.config.block_size-1).transpose(1, 2)
         v = self.value(x).view(B, T, self.config.n_embed,  C // self.config.n_head).transpose(1, 2) # (B, nh, T, hs)
         ##
         # Hi all, I am a little confused by the "init code" in SynthesizerAttention class. There, self.w2 and self.b2 are defined. But I don't know 
@@ -127,7 +127,7 @@ class SynthesizerAttention(nn.Module):
         # self.w1 (is A in the hand-out), self.w2 (is B in the hand-out, is of dimension d/h x l) and self.b2
         # causal self-attention; Self-attend: (B, nh, T, hs) x (B, nh, hs, T) -> (B, nh, T, T)
         #att = (q @ k.transpose(-2, -1)) * (1.0 / math.sqrt(k.size(-1)))
-        att = torch.nn.ReLU(w1) @ w2[:,:T].transpose(-2, -1) + b2[:T].transpose(-2, -1)
+        att = torch.nn.ReLU(w1) @ w2.transpose(-2, -1) + b2.transpose(-2, -1)
         att = att.masked_fill(self.mask[:,:,:T,:T] == 0, -1e10) # todo: just use float('-inf') instead?
         att = F.softmax(att, dim=-1)
         att = self.attn_drop(att)
