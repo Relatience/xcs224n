@@ -104,8 +104,8 @@ class SynthesizerAttention(nn.Module):
 
         # calculate query, key, values for all heads in batch and move head forward to be the batch dim
         w1 = self.w1(x).view(B, T, self.config.n_embed, C // self.config.n_head).transpose(1, 2) # (B, nh, T, hs)
-        w2 = self.w2(x).view(B, T, self.config.block_size-1, C // self.config.n_head).transpose(1, 2) # (B, nh, T, hs)
-        b2 = self.b2(x).view(B, T, self.config.block_size-1).transpose(1, 2)
+        w2 = self.w2(x)[:,:T]#view(B, T, self.config.block_size-1, C // self.config.n_head).transpose(1, 2) # (B, nh, T, hs)
+        b2 = self.b2(x)[:T]#.view(B, T, self.config.block_size-1).transpose(1, 2)
         v = self.value(x).view(B, T, self.config.n_embed,  C // self.config.n_head).transpose(1, 2) # (B, nh, T, hs)
         ##
         # Hi all, I am a little confused by the "init code" in SynthesizerAttention class. There, self.w2 and self.b2 are defined. But I don't know 
