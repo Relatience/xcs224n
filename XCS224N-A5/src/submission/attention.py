@@ -103,7 +103,7 @@ class SynthesizerAttention(nn.Module):
         B, T, C = x.size()
 
         # calculate query, key, values for all heads in batch and move head forward to be the batch dim
-        w1 = self.w1(x).view(B, T, self.config.n_embed, C // self.config.n_head).transpose(1, 2) # (B, nh, T, hs)
+        att = self.w1(x).view(B, T, self.config.n_embed, C // self.config.n_head).transpose(1, 2) # (B, nh, T, hs)
         #w2 = self.w2[:,:T]#(x).view(B, T, self.config.block_size-1, C // self.config.n_head).transpose(1, 2) # (B, nh, T, hs)
         #b2 = self.b2[:T]#(x).view(B, T, self.config.block_size-1).transpose(1, 2)
         v = self.value(x).view(B, T, self.config.n_embed,  C // self.config.n_head).transpose(1, 2) # (B, nh, T, hs)
